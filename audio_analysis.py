@@ -32,14 +32,24 @@ start_time = None
 end_time = None
 notes = []
 current_note = None
-
 # Converting the base frequency to actual notes
 for i, frequency in enumerate(f0):
-    if not np.isnan(frequency):
-        note = librosa.hz_to_note(frequency)
-        print(f"{frequency:.2f} Hz -> {note}")
+    if np.isnan(frequency):
+        if current_note is not None:
+            # the note just ended
+            end_time = times[i]
+            notes.append({
+                "note": current_note,
+                "start": start_time,
+                "end": end_time
+            })
+            current_note = None
+            start_time = times[i]
+        continue
+    note = librosa.hz_to_note(frequency)
+    print(f"{frequency:.2f} Hz -> {note}")
 
-    elif current_note == None:
+    if current_note is None:
         current_note = note
         start_time = times[i]
 
@@ -58,20 +68,15 @@ for i, frequency in enumerate(f0):
         current_note = note  # current note changes from one to the next
         start_time = times[i]
 
-    if np.isnan(frequency):
-        current_note = None
-        start_time = times[i]
-
-    elif current_note == None:
-        continue
-
-    else:
-        end_time = times[i]
-
+    if current_note is not None:
         notes.append({
             "note": current_note,
             "start": start_time,
             "end": end_time
         })
-        current_note = note
-        start_time = [i]
+    if current_note is note:
+        notes.append({
+            "note": note,
+            "start": start_time,
+            "end": times[:-1:]
+        })
