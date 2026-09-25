@@ -44,7 +44,7 @@ for i, frequency in enumerate(f0):
                 "end": end_time
             })
             current_note = None
-            start_time = times[i]
+            start_time = None
         continue
     note = librosa.hz_to_note(frequency)
     print(f"{frequency:.2f} Hz -> {note}")
@@ -68,12 +68,6 @@ for i, frequency in enumerate(f0):
         current_note = note  # current note changes from one to the next
         start_time = times[i]
 
-    if current_note is not None:
-        notes.append({
-            "note": current_note,
-            "start": start_time,
-            "end": end_time
-        })
     if current_note is note:
         notes.append({
             "note": note,
